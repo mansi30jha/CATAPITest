@@ -1,0 +1,361 @@
+{
+	"info": {
+		"_postman_id": "9a4b4b5d-4293-40b1-ad66-0e8c1b42634f",
+		"name": "CATAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "11748825"
+	},
+	"item": [
+		{
+			"name": "Get Images",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.collectionVariables.set(\"img_id\", jsonData[0].id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.thecatapi.com/v1/images/search",
+					"protocol": "https",
+					"host": [
+						"api",
+						"thecatapi",
+						"com"
+					],
+					"path": [
+						"v1",
+						"images",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post Favorite",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"",
+							"const subId = Math.floor((Math.random()*100 +1));",
+							"pm.collectionVariables.set(\"sub_id\", subId);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.collectionVariables.set(\"fav_id\", jsonData.id);",
+							"",
+							"pm.test(\"Sucess Message\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"SUCCESS\");",
+							"});",
+							"",
+							"pm.test(\"Successful POST request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 202]);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"image_id\":\"{{img_id}}\",\n\t\"sub_id\":\"{{sub_id}}\"\n}"
+				},
+				"url": {
+					"raw": "https://api.thecatapi.com/v1/favourites",
+					"protocol": "https",
+					"host": [
+						"api",
+						"thecatapi",
+						"com"
+					],
+					"path": [
+						"v1",
+						"favourites"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Favourites by subid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response id matching favourite id\", function () {",
+							"    pm.expect(pm.response.json()[0].id).to.eql(pm.variables.get(\"fav_id\"));",
+							"});",
+							"",
+							"pm.test(\"Response image id matches image id used for favourite\", function () {",
+							"    pm.expect(pm.response.json()[0].image_id).to.eql(pm.variables.get(\"img_id\"));",
+							"});",
+							"",
+							"pm.test(\"Response sub matches sub used for favourite\", function () {",
+							"    pm.expect(parseInt(pm.response.json()[0].sub_id)).to.eql(pm.variables.get(\"sub_id\"));",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://api.thecatapi.com/v1/favourites?sub_id={{sub_id}}",
+					"protocol": "https",
+					"host": [
+						"api",
+						"thecatapi",
+						"com"
+					],
+					"path": [
+						"v1",
+						"favourites"
+					],
+					"query": [
+						{
+							"key": "sub_id",
+							"value": "{{sub_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Favourites by fav id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response id matching favourite id\", function () {",
+							"    pm.expect(pm.response.json().id).to.eql(pm.variables.get(\"fav_id\"));",
+							"});",
+							"",
+							"pm.test(\"Response image id matches image id used for favourite\", function () {",
+							"    pm.expect(pm.response.json().image_id).to.eql(pm.variables.get(\"img_id\"));",
+							"});",
+							"",
+							"pm.test(\"Response sub matches sub used for favourite\", function () {",
+							"    pm.expect(parseInt(pm.response.json().sub_id)).to.eql(pm.variables.get(\"sub_id\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://api.thecatapi.com/v1/favourites/:favourite_id",
+					"protocol": "https",
+					"host": [
+						"api",
+						"thecatapi",
+						"com"
+					],
+					"path": [
+						"v1",
+						"favourites",
+						":favourite_id"
+					],
+					"variable": [
+						{
+							"key": "favourite_id",
+							"value": "{{fav_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete favourite",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Delete is sucessfull\", () => {",
+							"  const responseJson = pm.response.json();",
+							"  pm.expect(responseJson.message).to.eql(\"SUCCESS\");",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://api.thecatapi.com/v1/favourites/:favourite_id",
+					"protocol": "https",
+					"host": [
+						"api",
+						"thecatapi",
+						"com"
+					],
+					"path": [
+						"v1",
+						"favourites",
+						":favourite_id"
+					],
+					"variable": [
+						{
+							"key": "favourite_id",
+							"value": "{{fav_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{x-api-key}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "x-api-key",
+				"type": "string"
+			},
+			{
+				"key": "in",
+				"value": "query",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "x-api-key",
+			"value": "live_SklUJqNqHnPc3etVIUcCFpnWeVw78bx9S6dgtUqRgRqJ3P62fX9iKc6qTnuZFIoS",
+			"type": "string"
+		},
+		{
+			"key": "img_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "sub_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "fav_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
